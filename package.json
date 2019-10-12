@@ -2,11 +2,9 @@
   "author": {},
   "license": "MIT",
   "version": "0.0.1",
-
   "scripts": {
-    "server": "node_modules/.bin/http-server ."
+    "start": "node_modules/.bin/http-server ."
   },
-
   "dependencies": {
     "http-server": "^0.11.1"
   }
