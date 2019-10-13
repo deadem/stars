@@ -1,6 +1,12 @@
 let width = 800;
 let height = 600;
 
+let centerX = width / 2;
+let centerY = height / 2;
+
+let delta = 5000;
+let deltaZ = 2000;
+
 let config = {
     type: Phaser.AUTO,
     width,
@@ -22,37 +28,44 @@ function preload ()
 function create () {
     graphics = this.add.graphics();
 
-    for (let i = 0; i < 1000; ++i) {
+    for (let i = 0; i < 2000; ++i) {
         stars.push({
-            r: Math.random() * width,
-            a: Math.random() * Math.PI * 2,
-            d: (1 - Math.random() * 2) / 30,
-            z: 2 + Math.random() * 5,
+            coords: newDot(),
             rect: this.add.rectangle(0, 0, 4, 4, 0xffffff)});
     }
-
 }
 
-let tick = 0;
+function newDot() {
+    return {
+        x: -delta / 2 + Math.random() * delta,
+        y: -delta / 2 + Math.random() * delta,
+        z: -deltaZ
+    };
+}
+
+function translate(coords) {
+    let temp = height / coords.z;
+
+    return {
+        x: coords.x * temp,
+        y: coords.y * temp
+    };
+}
 
 function update () {
-    let centerX = width / 2;
-    let centerY = height / 2;
-
     stars.forEach(v => {
-        let x = v.r * Math.sin(v.a);
-        let y = v.r * Math.cos(v.a);
+        let coords = translate(v.coords);
+        let x = centerX + coords.x;
+        let y = centerY + coords.y;
+        v.coords.z += 10;
 
-        v.a += v.d;
-        v.r += v.z;
-
-        if (v.r > width) {
-            v.r = Math.random() * 100;
+        if (v.coords.z >= 0 || x < 0 || x > width || y < 0 || y > height) {
+            v.coords = newDot();
+            v.rect.setAlpha(0);
+            return;
         }
 
-        v.rect.setPosition(centerX + x, centerY + y);
-        v.rect.setAlpha(0.5 + v.r / width * Math.sin(tick));
-
+        v.rect.setPosition(x, y);
+        v.rect.setAlpha(0.01 + (deltaZ - Math.abs(v.coords.z)) / deltaZ);
     });
-    tick = tick + 0.1;
 }
